@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents a company.
-struct Company: Codable {
+struct Company: Codable, Hashable {
     
     /// A url for the company logo if one exists.
     let logo: URL

@@ -18,12 +18,22 @@ final class CompanySearchResultViewController: UIViewController {
     private let base = "https://autocomplete.clearbit.com/v1/companies/suggest"
     private var companies = [Company]()
 
+    enum Section {
+        case main
+    }
+
+    private lazy var tableViewDataSource = UITableViewDiffableDataSource<Section, Company>(tableView: tableView) { (tableView, indexPath, model) -> UITableViewCell? in
+        let cell = UITableViewCell.init(style: .default, reuseIdentifier: "companyCell")
+        cell.textLabel?.text = model.name
+        return cell
+    }
 
     // MARK: - UIViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.register(UINib(nibName: "CompanyLogoCell", bundle: nil), forCellWithReuseIdentifier: "CompanyLogoCell")
+        
         tableView.dataSource = self
     }
 
@@ -41,8 +51,26 @@ final class CompanySearchResultViewController: UIViewController {
                         guard let self = self else {
                             return
                         }
+
+                        var deletedIndexPaths = [IndexPath]()
+                        var insertedIndexPaths = [IndexPath]()
+                        let diff = companies.difference(from: self.companies)
+
+                        for change in diff {
+                            switch change {
+                            case let .remove(offset, _, _):
+                                deletedIndexPaths.append(IndexPath(row: offset, section: 0))
+                            case let .insert(offset, _, _):
+                                insertedIndexPaths.append(IndexPath(row: offset, section: 0))
+                            }
+                        }
+
                         self.companies = companies
-                        self.tableView.reloadData()
+
+                        self.tableView.performBatchUpdates({
+                            self.tableView.deleteRows(at: deletedIndexPaths, with: .fade)
+                            self.tableView.insertRows(at: insertedIndexPaths, with: .left)
+                        })
                         print(companies)
                     })
             .store(in: &cancellables)
