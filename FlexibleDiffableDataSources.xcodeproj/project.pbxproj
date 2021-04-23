@@ -19,6 +19,7 @@
 		AB4B641E262FB8AB00964C34 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = AB4B641D262FB8AB00964C34 /* Kingfisher */; };
 		AB4B6421262FBF6200964C34 /* CompanyLogoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB4B6420262FBF6200964C34 /* CompanyLogoCell.xib */; };
 		AB4B6424262FC04A00964C34 /* CompanyLogoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4B6423262FC04A00964C34 /* CompanyLogoCell.swift */; };
+		ABA81445263342F100C2DE08 /* DiffableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA81444263342F100C2DE08 /* DiffableDataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		AB4B63F5262D386000964C34 /* CompanySearchResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanySearchResultViewController.swift; sourceTree = "<group>"; };
 		AB4B6420262FBF6200964C34 /* CompanyLogoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CompanyLogoCell.xib; sourceTree = "<group>"; };
 		AB4B6423262FC04A00964C34 /* CompanyLogoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanyLogoCell.swift; sourceTree = "<group>"; };
+		ABA81444263342F100C2DE08 /* DiffableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffableDataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 				AB4B63C7262D13D600964C34 /* Assets.xcassets */,
 				AB4B63C9262D13D600964C34 /* LaunchScreen.storyboard */,
 				AB4B63CC262D13D600964C34 /* Info.plist */,
+				ABA81444263342F100C2DE08 /* DiffableDataSource.swift */,
 			);
 			path = FlexibleDiffableDataSources;
 			sourceTree = "<group>";
@@ -188,6 +191,7 @@
 				AB4B63BF262D13D500964C34 /* AppDelegate.swift in Sources */,
 				AB4B63E3262D15FC00964C34 /* Networking.swift in Sources */,
 				AB4B63D9262D149000964C34 /* TableViewSection.swift in Sources */,
+				ABA81445263342F100C2DE08 /* DiffableDataSource.swift in Sources */,
 				AB4B63C1262D13D500964C34 /* SceneDelegate.swift in Sources */,
 				AB4B6424262FC04A00964C34 /* CompanyLogoCell.swift in Sources */,
 				AB4B63F6262D386000964C34 /* CompanySearchResultViewController.swift in Sources */,

@@ -22,18 +22,18 @@ final class CompanySearchResultViewController: UIViewController {
         case main
     }
 
-    private lazy var tableViewDataSource = UITableViewDiffableDataSource<Section, Company>(tableView: tableView) { (tableView, indexPath, model) -> UITableViewCell? in
-        let cell = UITableViewCell.init(style: .default, reuseIdentifier: "companyCell")
+    private lazy var tableViewDataSource = DiffableDataSource<TableViewSection, Company>(collectionType: .tableView(tableView, tableViewCellConfiguration: { (tableView, indexPath, model) -> UITableViewCell? in
+        let cell = UITableViewCell(style: .default, reuseIdentifier: "companyCell")
         cell.textLabel?.text = model.name
-        return cell
-    }
 
-    private lazy var collectionViewDataSource = UICollectionViewDiffableDataSource<Section, Company>(collectionView: collectionView) {
-        (collectionView, indexPath, model) -> UICollectionViewCell? in
+        return cell
+    }))
+
+    private lazy var collectionViewDataSource = DiffableDataSource<TableViewSection, Company>(collectionType: .collectionView(collectionView, collectionViewCellConfiguration: { (collectionView, indexPath, model) -> UICollectionViewCell? in
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CompanyLogoCell", for: indexPath) as? CompanyLogoCell
         cell?.viewModel = CompanyLogoCell.ViewModel(imageURL: model.logo)
         return cell
-    }
+    }, collectionViewSupplementaryViewProvider: nil))
 
     private let compositionalLayout: UICollectionViewCompositionalLayout = {
         let fraction: CGFloat = 1.0 / 3.0
@@ -111,10 +111,10 @@ extension CompanySearchResultViewController {
 extension CompanySearchResultViewController {
 
     private func updateCompanies(companies: [Company]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Company>()
+        var snapshot = NSDiffableDataSourceSnapshot<TableViewSection, Company>()
         snapshot.appendSections([.main])
         snapshot.appendItems(companies)
-        tableViewDataSource.apply(snapshot, animatingDifferences: true)
-        collectionViewDataSource.apply(snapshot, animatingDifferences: true)
+        tableViewDataSource.apply(snapshot)
+        collectionViewDataSource.apply(snapshot)
     }
 }
