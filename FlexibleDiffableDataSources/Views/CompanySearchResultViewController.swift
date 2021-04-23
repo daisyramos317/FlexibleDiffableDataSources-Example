@@ -28,13 +28,50 @@ final class CompanySearchResultViewController: UIViewController {
         return cell
     }
 
+    private lazy var collectionViewDataSource = UICollectionViewDiffableDataSource<Section, Company>(collectionView: collectionView) {
+        (collectionView, indexPath, model) -> UICollectionViewCell? in
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CompanyLogoCell", for: indexPath) as? CompanyLogoCell
+        cell?.viewModel = CompanyLogoCell.ViewModel(imageURL: model.logo)
+        return cell
+    }
+
+    private let compositionalLayout: UICollectionViewCompositionalLayout = {
+        let fraction: CGFloat = 1.0 / 3.0
+
+        // Item
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+        // Group
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(fraction), heightDimension: .fractionalWidth(fraction))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
+        // Section
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 100, leading: 2.5, bottom: 0, trailing: 2.5)
+        section.orthogonalScrollingBehavior = .continuous
+        section.visibleItemsInvalidationHandler = { (items, offset, environment) in
+            items.forEach { item in
+                let distanceFromCenter = abs((item.frame.midX - offset.x) - environment.container.contentSize.width / 2.0)
+                let minScale: CGFloat = 0.7
+                let maxScale: CGFloat = 1.1
+                let scale = max(maxScale - (distanceFromCenter / environment.container.contentSize.width), minScale)
+                item.transform = CGAffineTransform(scaleX: scale, y: scale)
+            }
+        }
+
+        return UICollectionViewCompositionalLayout(section: section)
+    }()
+
     // MARK: - UIViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.register(UINib(nibName: "CompanyLogoCell", bundle: nil), forCellWithReuseIdentifier: "CompanyLogoCell")
         
-        tableView.dataSource = self
+        tableView.dataSource = tableViewDataSource
+        collectionView.dataSource = collectionViewDataSource
+        collectionView.collectionViewLayout = compositionalLayout
     }
 
     // MARK:- CompanySearchResultViewController
@@ -52,25 +89,7 @@ final class CompanySearchResultViewController: UIViewController {
                             return
                         }
 
-                        var deletedIndexPaths = [IndexPath]()
-                        var insertedIndexPaths = [IndexPath]()
-                        let diff = companies.difference(from: self.companies)
-
-                        for change in diff {
-                            switch change {
-                            case let .remove(offset, _, _):
-                                deletedIndexPaths.append(IndexPath(row: offset, section: 0))
-                            case let .insert(offset, _, _):
-                                insertedIndexPaths.append(IndexPath(row: offset, section: 0))
-                            }
-                        }
-
-                        self.companies = companies
-
-                        self.tableView.performBatchUpdates({
-                            self.tableView.deleteRows(at: deletedIndexPaths, with: .fade)
-                            self.tableView.insertRows(at: insertedIndexPaths, with: .left)
-                        })
+                        self.updateCompanies(companies: companies)
                         print(companies)
                     })
             .store(in: &cancellables)
@@ -89,18 +108,13 @@ extension CompanySearchResultViewController {
     }
 }
 
-extension CompanySearchResultViewController: UITableViewDataSource {
-    
+extension CompanySearchResultViewController {
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return companies.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let company = companies[indexPath.row]
-        let cell = UITableViewCell(style: .default, reuseIdentifier: "companyCell")
-        cell.textLabel?.text = company.name
-
-        return cell
+    private func updateCompanies(companies: [Company]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Company>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(companies)
+        tableViewDataSource.apply(snapshot, animatingDifferences: true)
+        collectionViewDataSource.apply(snapshot, animatingDifferences: true)
     }
 }
